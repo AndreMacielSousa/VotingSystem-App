@@ -114,6 +114,12 @@ VotingSystem-App/
 └─ README.md
 ```
 
+## Links
+
+- Repositório: https://github.com/AndreMacielSousa/VotingSystem-App
+- Página pública (docente): https://andremaciel.pt/IS2026/
+- Aplicação em execução: (a preencher após deploy)
+
 ## 8. Autor
 
 Andre Sousa — MEIW / UAb-UTAD

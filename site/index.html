@@ -1,19 +1,47 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8">
-  <title>Integração de Sistemas — Trabalho Final</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Integração de Sistemas — Voting System (IS2026)</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 920px; margin: 32px auto; padding: 0 16px; line-height: 1.5; }
+    .card { border: 1px solid #e5e5e5; border-radius: 10px; padding: 16px; margin: 14px 0; }
+    code { background: #f6f6f6; padding: 2px 6px; border-radius: 6px; }
+    a { text-decoration: none; }
+  </style>
 </head>
 <body>
-  <h1>Voting System — Integração de Sistemas</h1>
+  <h1>Voting System — Trabalho Final (Integração de Sistemas)</h1>
+  <p>Esta página agrega os recursos necessários para teste e avaliação do trabalho.</p>
 
-  <p>Trabalho Final da UC de Integração de Sistemas</p>
+  <div class="card">
+    <h2>Repositório GitHub</h2>
+    <p>
+      <a href="https://github.com/AndreMacielSousa/VotingSystem-App" target="_blank" rel="noopener">
+        https://github.com/AndreMacielSousa/VotingSystem-App
+      </a>
+    </p>
+  </div>
 
-  <ul>
-    <li><a href="https://github.com/AndreMacielSousa/VotingSystem-App" target="_blank">Repositório GitHub</a></li>
-    <li><a href="https://URL-DA-APP-DEPLOYADA" target="_blank">Aplicação em execução</a></li>
-  </ul>
+  <div class="card">
+    <h2>Aplicação em execução</h2>
+    <p><strong>Link:</strong> <em>(a preencher após deploy)</em></p>
+    <p>Nota: a aplicação consome os serviços gRPC remotos disponibilizados para a unidade curricular.</p>
+  </div>
 
-  <p>Autor: André Sousa — MEIW (UAb / UTAD)</p>
+  <div class="card">
+    <h2>Guia de teste (processo em 3 fases)</h2>
+    <ol>
+      <li><strong>Registo</strong>: introduzir <code>citizen_card_number</code> e obter <code>voting_credential</code>.</li>
+      <li><strong>Votação</strong>: consultar candidatos e submeter voto com <code>voting_credential</code> + <code>candidate_id</code>.</li>
+      <li><strong>Apuramento</strong>: consultar resultados agregados (serviço de resultados da AV).</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>Contacto</h2>
+    <p>Autor: André Sousa — MEIW (UAb/UTAD)</p>
+  </div>
 </body>
 </html>

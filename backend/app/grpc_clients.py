@@ -10,7 +10,9 @@ GRPC_TARGET = os.getenv("GRPC_TARGET", "ken01.utad.pt:9091")
 def _channel():
     # Nota: nos testes com grpcurl foi usado -insecure (sem validação TLS).
     # Aqui replicamos o comportamento com canal inseguro.
-    return grpc.insecure_channel(GRPC_TARGET)
+    credentials = grpc.ssl_channel_credentials()
+    return grpc.secure_channel(GRPC_TARGET, credentials)
+
 
 
 class RegistrationClient:

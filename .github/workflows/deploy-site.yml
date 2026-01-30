@@ -3,24 +3,24 @@ name: Deploy site to andremaciel.pt/IS2026 (FTP)
 on:
   push:
     branches:
-      - main
-    paths:
-      - "site/**"
+      - main   # se o seu branch principal for 'master', troque aqui para 'master'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout do código
         uses: actions/checkout@v4
 
       - name: Deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.3
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT }}
+          protocol: "ftp"              # se souber que o alojamento suporta FTPS, pode mudar para "ftps"
           local-dir: "./IS2026/"
           server-dir: "/"
           exclude: |

@@ -7,17 +7,20 @@ from . import voting_pb2, voting_pb2_grpc
 GRPC_TARGET = os.getenv("GRPC_TARGET", "ken01.utad.pt:9091")
 GRPC_CERT_PEM_PATH = os.getenv("GRPC_CERT_PEM_PATH", r"C:\work\VotingSystem\ken01_utad_pt_9091.pem")
 
+# ESTE É O CN QUE ENCONTRASTE:
+GRPC_CERT_HOSTNAME = os.getenv("GRPC_CERT_HOSTNAME", "TRAEFIK DEFAULT CERT")
 
 
 def _channel():
-    # Carrega o certificado do servidor (ou CA) e usa-o como root trust para evitar CERTIFICATE_VERIFY_FAILED.
     with open(GRPC_CERT_PEM_PATH, "rb") as f:
         trusted_certs = f.read()
 
     creds = grpc.ssl_channel_credentials(root_certificates=trusted_certs)
 
-    # Dica de robustez: opcional, força o "servername" a coincidir com o host.
-    options = (("grpc.ssl_target_name_override", "ken01.utad.pt"),)
+    # IMPORTANTÍSSIMO: força o nome usado na verificação TLS para o CN real do certificado
+    options = (
+        ("grpc.ssl_target_name_override", GRPC_CERT_HOSTNAME),
+    )
 
     return grpc.secure_channel(GRPC_TARGET, creds, options=options)
 

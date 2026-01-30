@@ -21,5 +21,8 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: site/
-          server-dir: public_html/IS2026/
+          local-dir: "./IS2026/"
+          server-dir: "/"
+          exclude: |
+            **/.git*
+            **/.github*

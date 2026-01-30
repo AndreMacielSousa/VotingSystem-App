@@ -1,0 +1,19 @@
+
+syntax = "proto3";
+
+option csharp_namespace = "VotingSystem.Registration";
+
+package voting;
+
+service VoterRegistrationService {
+  rpc IssueVotingCredential (VoterRequest) returns (VoterResponse);
+}
+
+message VoterRequest {
+  string citizen_card_number = 1;
+}
+
+message VoterResponse {
+  bool is_eligible = 1;
+  string voting_credential = 2;
+}

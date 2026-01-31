@@ -1,47 +1,299 @@
-<!DOCTYPE html>
-<html lang="pt">
+<!doctype html>
+<html lang="pt-PT">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Integração de Sistemas — Voting System (IS2026)</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VotingSystem-App — Frontend</title>
+
   <style>
-    body { font-family: Arial, sans-serif; max-width: 920px; margin: 32px auto; padding: 0 16px; line-height: 1.5; }
-    .card { border: 1px solid #e5e5e5; border-radius: 10px; padding: 16px; margin: 14px 0; }
-    code { background: #f6f6f6; padding: 2px 6px; border-radius: 6px; }
-    a { text-decoration: none; }
+    :root {
+      --bg: #0b1220;
+      --card: #121a2b;
+      --muted: #8ea0c8;
+      --text: #e9efff;
+      --accent: #6aa6ff;
+      --ok: #2dd4bf;
+      --warn: #fbbf24;
+      --err: #fb7185;
+      --border: rgba(255,255,255,0.10);
+      --shadow: 0 12px 35px rgba(0,0,0,0.35);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      background: radial-gradient(1200px 600px at 20% 10%, rgba(106,166,255,0.25), transparent 60%),
+                  radial-gradient(900px 500px at 80% 0%, rgba(45,212,191,0.18), transparent 55%),
+                  var(--bg);
+      color: var(--text);
+      line-height: 1.35;
+    }
+
+    header {
+      padding: 28px 18px 10px;
+      max-width: 1050px;
+      margin: 0 auto;
+    }
+
+    .title {
+      display: flex;
+      gap: 12px;
+      align-items: baseline;
+      flex-wrap: wrap;
+    }
+    .title h1 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 0.2px;
+    }
+    .title .meta {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .wrap {
+      max-width: 1050px;
+      margin: 0 auto;
+      padding: 14px 18px 34px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 980px) {
+      .wrap { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 16px;
+    }
+
+    .steps {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .pill {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 12px;
+      color: var(--muted);
+      user-select: none;
+    }
+    .pill.active { border-color: rgba(106,166,255,0.55); color: var(--text); }
+    .pill.ok { border-color: rgba(45,212,191,0.55); color: var(--text); }
+
+    label {
+      display: block;
+      margin: 10px 0 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    input, select {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.25);
+      color: var(--text);
+      padding: 10px 12px;
+      outline: none;
+    }
+    input::placeholder { color: rgba(142,160,200,0.6); }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 600px) {
+      .row { grid-template-columns: 1fr; }
+    }
+
+    .btns {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      background: rgba(106,166,255,0.22);
+      color: var(--text);
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      transition: transform 0.05s ease-in-out, background 0.15s ease-in-out;
+    }
+    button:hover { background: rgba(106,166,255,0.30); }
+    button:active { transform: translateY(1px); }
+    button.secondary { background: rgba(255,255,255,0.06); }
+    button.danger { background: rgba(251,113,133,0.18); }
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    .msg {
+      margin-top: 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 13px;
+      color: var(--muted);
+      background: rgba(0,0,0,0.18);
+      white-space: pre-wrap;
+    }
+    .msg.ok { border-color: rgba(45,212,191,0.55); color: rgba(233,239,255,0.95); }
+    .msg.warn { border-color: rgba(251,191,36,0.55); color: rgba(233,239,255,0.95); }
+    .msg.err { border-color: rgba(251,113,133,0.55); color: rgba(233,239,255,0.95); }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      overflow: hidden;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    th, td {
+      padding: 10px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      font-size: 13px;
+    }
+    th { color: var(--muted); font-weight: 600; background: rgba(0,0,0,0.18); }
+    tr:last-child td { border-bottom: 0; }
+
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
   </style>
 </head>
+
 <body>
-  <h1>Voting System — Trabalho Final (Integração de Sistemas)</h1>
-  <p>Esta página agrega os recursos necessários para teste e avaliação do trabalho.</p>
+  <header>
+    <div class="title">
+      <h1>VotingSystem-App</h1>
+      <div class="meta">Frontend estático — processo em três fases (Registo → Votação → Apuramento)</div>
+    </div>
+  </header>
 
-  <div class="card">
-    <h2>Repositório GitHub</h2>
-    <p>
-      <a href="https://github.com/AndreMacielSousa/VotingSystem-App" target="_blank" rel="noopener">
-        https://github.com/AndreMacielSousa/VotingSystem-App
-      </a>
-    </p>
-  </div>
+  <main class="wrap">
+    <section class="card" aria-label="Fluxo">
+      <div class="steps">
+        <span id="pill-reg" class="pill">1) Registo</span>
+        <span id="pill-vote" class="pill">2) Votação</span>
+        <span id="pill-res" class="pill">3) Apuramento</span>
+      </div>
 
-  <div class="card">
-    <h2>Aplicação em execução</h2>
-    <p><strong>Link:</strong> <em>(a preencher após deploy)</em></p>
-    <p>Nota: a aplicação consome os serviços gRPC remotos disponibilizados para a unidade curricular.</p>
-  </div>
+      <h2>1) Registo — emissão de credencial</h2>
+      <label for="cc">Número do Cartão de Cidadão</label>
+      <input id="cc" inputmode="numeric" autocomplete="off" placeholder="Ex.: 123456789" />
 
-  <div class="card">
-    <h2>Guia de teste (processo em 3 fases)</h2>
-    <ol>
-      <li><strong>Registo</strong>: introduzir <code>citizen_card_number</code> e obter <code>voting_credential</code>.</li>
-      <li><strong>Votação</strong>: consultar candidatos e submeter voto com <code>voting_credential</code> + <code>candidate_id</code>.</li>
-      <li><strong>Apuramento</strong>: consultar resultados agregados (serviço de resultados da AV).</li>
-    </ol>
-  </div>
+      <div class="btns">
+        <button id="btn-register">Obter credencial</button>
+        <button id="btn-clear" class="secondary">Limpar sessão</button>
+      </div>
 
-  <div class="card">
-    <h2>Contacto</h2>
-    <p>Autor: André Sousa — MEIW (UAb/UTAD)</p>
-  </div>
+      <div id="reg-msg" class="msg" role="status">Aguardando ação.</div>
+
+      <hr style="border:0;border-top:1px solid var(--border);margin:14px 0;">
+
+      <h2>2) Votação — escolher candidato e votar</h2>
+
+      <div class="row">
+        <div>
+          <label for="candidate">Candidato</label>
+          <select id="candidate" disabled>
+            <option value="">(carregar candidatos)</option>
+          </select>
+          <div class="small">A lista é obtida via serviço AV.</div>
+        </div>
+
+        <div>
+          <label for="cred">Credencial (na sessão)</label>
+          <input id="cred" class="mono" readonly placeholder="(a credencial aparecerá aqui)" />
+          <!-- ✅ TEXTO REFORMULADO AQUI -->
+          <div class="small">
+            <b>Nota:</b> na fase de votação, a credencial é utilizada de forma independente e
+            <b>não mantém qualquer associação ao Cartão de Cidadão</b>, garantindo o anonimato do voto.
+          </div>
+        </div>
+      </div>
+
+      <div class="btns">
+        <button id="btn-load-candidates" class="secondary" disabled>Carregar candidatos</button>
+        <button id="btn-vote" disabled>Submeter voto</button>
+      </div>
+
+      <div id="vote-msg" class="msg" role="status">Sem ações de votação.</div>
+
+      <hr style="border:0;border-top:1px solid var(--border);margin:14px 0;">
+
+      <h2>3) Apuramento — resultados agregados</h2>
+
+      <div class="btns">
+        <button id="btn-results" class="secondary">Obter resultados</button>
+      </div>
+
+      <div id="res-wrap" class="small">Os resultados são agregados (sem reidentificação).</div>
+      <div id="res-msg" class="msg" role="status">Sem resultados carregados.</div>
+
+      <table id="res-table" style="display:none;">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Candidato</th>
+            <th>Votos</th>
+          </tr>
+        </thead>
+        <tbody id="res-tbody"></tbody>
+      </table>
+    </section>
+
+    <aside class="card" aria-label="Estado e configuração">
+      <h2>Estado e configuração</h2>
+      <div class="small">Backend atual configurado:</div>
+      <div id="backend-url" class="msg mono"></div>
+
+      <div class="small" style="margin-top:10px;">
+        <b>Nota técnica:</b> se o frontend estiver num domínio diferente do backend, será necessário permitir CORS no backend.
+      </div>
+
+      <div class="small" style="margin-top:10px;">
+        <b>Persistência:</b> a credencial é guardada apenas em <span class="mono">sessionStorage</span> (válida enquanto o separador existir).
+      </div>
+
+      <div class="small" style="margin-top:10px;">
+        <b>Robustez:</b> após voto aceite, a credencial é marcada como usada na sessão e o frontend evita novas submissões.
+      </div>
+    </aside>
+  </main>
+
+  <script src="./config.js"></script>
+  <script src="./app.js"></script>
 </body>
 </html>
+

@@ -1,12 +1,42 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
+from fastapi.middleware.cors import CORSMiddleware
+import os
+
 
 from .grpc_clients import RegistrationClient, VotingClient, GrpcurlError
 
 load_dotenv()
 
 app = FastAPI(title="VotingSystem-App Backend", version="0.2.1")
+
+# -----------------------------
+# CORS (Cross-Origin Resource Sharing)
+# Necessário para permitir que o frontend (origem diferente) consuma a API.
+# -----------------------------
+allowed_origins = [
+    # Desenvolvimento local (frontend)
+    "http://127.0.0.1:5500",
+    "http://localhost:5500",
+
+    # Se testares o frontend noutro porto local
+    "http://127.0.0.1:5173",
+    "http://localhost:5173",
+
+    # Produção (frontend publicado)
+    "https://andremaciel.pt",
+    "https://www.andremaciel.pt",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 registration = RegistrationClient()
 voting = VotingClient()

@@ -189,6 +189,21 @@
     tr:last-child td { border-bottom: 0; }
 
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+
+    /* Aviso de demo online */
+    .banner {
+      border: 1px solid rgba(251,191,36,0.50);
+      background: rgba(251,191,36,0.10);
+      border-radius: 16px;
+      padding: 12px 14px;
+      margin: 12px 18px 0;
+      max-width: 1050px;
+      color: rgba(233,239,255,0.95);
+      box-shadow: var(--shadow);
+    }
+    .banner a { color: var(--text); text-decoration: underline; }
+    .banner .title { font-weight: 700; font-size: 13px; margin-bottom: 4px; }
+    .banner .body { font-size: 13px; color: rgba(233,239,255,0.92); }
   </style>
 </head>
 
@@ -199,6 +214,19 @@
       <div class="meta">Frontend estático — processo em três fases (Registo → Votação → Apuramento)</div>
     </div>
   </header>
+
+  <!-- Banner online (aparece apenas se IS_ONLINE_DEMO=true) -->
+  <div id="online-banner" class="banner" style="display:none;">
+    <div class="title">Demonstração online (limitação técnica deliberada)</div>
+    <div class="body">
+      Esta página está publicada apenas como <b>interface demonstrativa</b>. O backend não é exposto publicamente neste servidor
+      devido a limitações do alojamento (ausência de reverse proxy e impossibilidade de manter serviços persistentes), bem como
+      restrições do browser a chamadas HTTP a partir de páginas HTTPS (mixed content).
+      <br><br>
+      Para testar o protótipo completo (backend + frontend), consulte o repositório e siga as instruções de execução local:
+      <a id="repo-link" href="#" target="_blank" rel="noreferrer">GitHub — VotingSystem-App</a>.
+    </div>
+  </div>
 
   <main class="wrap">
     <section class="card" aria-label="Fluxo">
@@ -235,7 +263,6 @@
         <div>
           <label for="cred">Credencial (na sessão)</label>
           <input id="cred" class="mono" readonly placeholder="(a credencial aparecerá aqui)" />
-          <!-- ✅ TEXTO REFORMULADO AQUI -->
           <div class="small">
             <b>Nota:</b> na fase de votação, a credencial é utilizada de forma independente e
             <b>não mantém qualquer associação ao Cartão de Cidadão</b>, garantindo o anonimato do voto.
@@ -279,7 +306,7 @@
       <div id="backend-url" class="msg mono"></div>
 
       <div class="small" style="margin-top:10px;">
-        <b>Nota técnica:</b> se o frontend estiver num domínio diferente do backend, será necessário permitir CORS no backend.
+        <b>Nota técnica:</b> em execução local, a API é consumida a partir de uma origem diferente (CORS), sendo o backend configurado para permitir essa comunicação.
       </div>
 
       <div class="small" style="margin-top:10px;">
@@ -294,6 +321,18 @@
 
   <script src="./config.js"></script>
   <script src="./app.js"></script>
+  <script>
+    // Ativar banner online e link para o repositório, se aplicável
+    (function () {
+      const cfg = window.APP_CONFIG || {};
+      const banner = document.getElementById("online-banner");
+      const repoLink = document.getElementById("repo-link");
+      if (cfg.IS_ONLINE_DEMO) {
+        banner.style.display = "block";
+        repoLink.href = cfg.GITHUB_REPO_URL || "#";
+      }
+    })();
+  </script>
 </body>
 </html>
 

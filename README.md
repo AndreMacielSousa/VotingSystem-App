@@ -1,129 +1,184 @@
-# Voting System (gRPC) — Aplicação Web (Tarefa 3)
+# VotingSystem-App
 
-Este repositório contém uma aplicação web simples que implementa o processo de votação em **3 fases** (Registo → Votação → Apuramento), consumindo serviços **gRPC remotos** disponibilizados para o trabalho final.
+Protótipo de aplicação de votação eletrónica que consome serviços gRPC remotos e expõe um backend REST (orquestração) + frontend web estático, seguindo um processo em três fases:
+1) Registo (emissão de credencial)
+2) Votação (submissão de voto com credencial)
+3) Apuramento (consulta de resultados agregados)
 
-A aplicação **não implementa** os serviços gRPC; atua como **cliente gRPC** e orquestra o processo descrito no enunciado.
-
----
-
-## 1. Serviços gRPC consumidos
-
-Endpoint:
-- `ken01.utad.pt:9091`
-
-Contratos (ficheiros `.proto` neste repositório):
-- `Protos/voter.proto`
-  - `voting.VoterRegistrationService/IssueVotingCredential`
-  - Campos principais: `citizen_card_number`, `is_eligible`, `voting_credential`
-- `Protos/voting.proto`
-  - `voting.VotingService/GetCandidates`
-  - `voting.VotingService/Vote`
-  - `voting.VotingService/GetResults`
-  - Campos principais: `voting_credential`, `candidate_id`, `success`, `message`, `results`
+## Nota sobre a demonstração online (andremaciel.pt/IS2026)
+A página publicada em `https://andremaciel.pt/IS2026/` é uma **interface demonstrativa**.  
+O protótipo completo requer execução local do backend devido a limitações técnicas do alojamento (ausência de reverse proxy e de suporte a processos persistentes) e a restrições do browser para chamadas HTTP a partir de páginas HTTPS (mixed content).  
+O procedimento completo de teste encontra-se abaixo.
 
 ---
 
-## 2. Processo implementado (3 fases)
+## Requisitos (execução local)
+- Windows + PowerShell
+- Python 3.11 (recomendado) instalado
+- `grpcurl` instalado e acessível no PATH (necessário para o backend, que usa grpcurl como mitigação técnica para TLS do endpoint remoto)
+- Acesso à Internet (para contactar os serviços remotos)
 
-### Fase 1 — Registo
-1. O utilizador introduz o número de Cartão de Cidadão (`citizen_card_number`).
-2. A aplicação invoca `IssueVotingCredential`.
-3. Se `is_eligible = true`, guarda a `voting_credential` na sessão e avança para a Fase 2.
-4. Caso contrário, bloqueia o avanço.
-
-### Fase 2 — Votação
-1. A aplicação invoca `GetCandidates` e apresenta a lista.
-2. O utilizador seleciona o candidato (por `id`).
-3. A aplicação invoca `Vote` com `{voting_credential, candidate_id}`.
-4. Se o voto for aceite (`success = true`), a aplicação marca o estado `has_voted = true`.
-
-> Nota de robustez (baseada nos testes da Tarefa 2):  
-> o mock aceita reutilização da mesma credencial. Por esse motivo, a aplicação implementa um bloqueio local por sessão após um voto aceite.
-
-### Fase 3 — Apuramento
-1. A aplicação invoca `GetResults`.
-2. Apresenta resultados agregados (`candidato`, `votos`).
+> Nota: o frontend é estático e pode ser servido por `python -m http.server`.
 
 ---
 
-## 3. Requisitos
-
-- Python 3.11+ (recomendado)
-- Dependências em `requirements.txt`
+## Estrutura do projeto
+- `backend/` — API REST (FastAPI) que consome os serviços gRPC remotos
+- `site/` — frontend estático (HTML + JS)
 
 ---
 
-## 4. Instalação e execução local
+## 1) Executar o backend (FastAPI)
 
-### 4.1 Criar ambiente virtual
+### 1.1 Criar e ativar ambiente virtual
 ```powershell
-python -m venv .venv
-.\.venv\Scripts\activate
-
+cd .\backend
+py -3.11 -m venv .venv
+.\.venv\Scripts\Activate.ps1
 ```
 
-### 4.2 Instalar dependências
+### 1.2 Instalar dependências
 ```powershell
-pip install -r requirements.txt
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+
 ```
 
-### 4.3 Executar
+### 1.3 Arrancar o backend
 ```powershell
-python app.py
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+
 ```
 
-Aceder em: http://127.0.0.1:5000
-
-### 5. Testes rápidos com grpcurl (validação do endpoint)
-Executar a partir de uma pasta que contenha Protos/.
-
-### 5.1 Emitir credencial
+### 1.4 Testes rápidos ao backend (PowerShell)
+Numa nova janela PowerShell:
 ```powershell
-'{"citizen_card_number":"123456789"}' | grpcurl -insecure -proto Protos/voter.proto -d "@" ken01.utad.pt:9091 voting.VoterRegistrationService/IssueVotingCredential
+curl http://127.0.0.1:8000/health
+curl http://127.0.0.1:8000/candidates
+curl -Method POST http://127.0.0.1:8000/register -ContentType "application/json" -Body '{"citizen_card_number":"123456789"}'
 
 ```
-### 5.2 Obter candidatos
+
+## 2) Executar o frontend (site)
+Numa nova janela PowerShell:
 ```powershell
-grpcurl -insecure -proto Protos/voting.proto ken01.utad.pt:9091 voting.VotingService/GetCandidates
-```
+cd .\site
+py -m http.server 5500
 
-### 5.3 Votar (exemplo)
+```
+Abrir no browser: http://127.0.0.1:5500
+
+## 3) Teste funcional completo (via browser)
+
+### 3.1 Registo
+
+Introduzir um número de Cartão de Cidadão (mock)
+
+Clicar em “Obter credencial”
+
+Se "is_eligible=false", repetir com outro número até obter credencial
+
+### 3.2 Votação
+
+Clicar em “Carregar candidatos”
+
+Selecionar um candidato
+
+Clicar em “Submeter voto”
+
+Confirmar mensagem de sucesso
+
+### 3.3 Apuramento
+
+Clicar em “Obter resultados”
+
+Verificar tabela com votos agregados
+
+### 3.4 Robustez (bloqueio local)
+
+Após um voto aceite, repetir a submissão com a mesma credencial:
+
+o frontend/back-end devem bloquear nova submissão na mesma sessão, preservando a coerência do protótipo.
+
+## 4) Observações técnicas relevantes
+
+O backend utiliza grpcurl como mitigação pragmática para limitações TLS do endpoint remoto (certificado sem SAN/hostname válido), mantendo o fluxo de teste exigido.
+
+O backend aplica CORS para permitir consumo do frontend em origem diferente durante o desenvolvimento local.
+
+A credencial de votação é utilizada na fase de voto sem associação à identidade do eleitor, alinhada com o princípio do anonimato do voto.
+
+--- 
+
+# Testes necessários para reconfirmar que está tudo OK (local)
+
+## A) Backend (PowerShell)
+
+1) **Health**
 ```powershell
-'{"voting_credential":"CRED-ABC-123","candidate_id":1}' | grpcurl -insecure -proto Protos/voting.proto -d "@" ken01.utad.pt:9091 voting.VotingService/Vote
+curl http://127.0.0.1:8000/health
 ```
-### 5.4 Obter resultados
+
+✅ Esperado: {"status":"ok"}
+
+2) **Candidatos**
+
 ```powershell
-grpcurl -insecure -proto Protos/voting.proto ken01.utad.pt:9091 voting.VotingService/GetResults
+curl http://127.0.0.1:8000/candidates
 ```
+✅ Esperado: lista de candidatos
 
-## 6. Deploy e publicação
-
-### Publicação em andremaciel.pt/IS2026
-
-## 7. Estrutura do projeto
-
-```cpp
-VotingSystem-App/
-├─ app.py
-├─ grpc_clients.py
-├─ Protos/
-├─ templates/
-├─ static/
-├─ requirements.txt
-├─ Procfile
-└─ README.md
+3) **Registo (até sair elegível)**
+```powershell
+curl -Method POST http://127.0.0.1:8000/register -ContentType "application/json" -Body '{"citizen_card_number":"706782478"}'
 ```
+✅ Esperado: quando for elegível -> credencial CRED-...
 
-## Links
+4) **Votar**
+```powershell
+curl -Method POST http://127.0.0.1:8000/vote -ContentType "application/json" -Body '{"voting_credential":"CRED-ABC-123","candidate_id":2}'
+```
+✅ Esperado: success:true
 
-- Repositório: https://github.com/AndreMacielSousa/VotingSystem-App
-- Página pública (docente): https://andremaciel.pt/IS2026/
-- Aplicação em execução: (a preencher após deploy)
+5) **Resultados**
+```powershell
+curl http://127.0.0.1:8000/results
+```
+✅ Esperado: tabela/array com votos
 
-## 8. Autor
+6) **Bloqueio local (tentar votar novamente com a mesma credencial)**
+```powershell
+curl -Method POST http://127.0.0.1:8000/vote -ContentType "application/json" -Body '{"voting_credential":"CRED-ABC-123","candidate_id":2}'
+```
+✅ Esperado: erro do backend indicando bloqueio local da credencial.
 
-Andre Sousa — MEIW / UAb-UTAD
 
+## B) Frontend (browser)
 
+1. abrir http://127.0.0.1:5500
 
+2. registar até ter credencial
 
+3. carregar candidatos
+
+4. votar
+
+5. obter resultados
+
+6. tentar votar novamente → deve ser bloqueado (UI + backend)
+
+---
+
+Referências bibliográficas (ABNT)
+
+FASTAPI. CORS (Cross-Origin Resource Sharing). [S. l.], s. d. Disponível em: https://fastapi.tiangolo.com/tutorial/cors/
+. Acesso em: 31 jan. 2026.
+
+MDN WEB DOCS. Mixed content. [S. l.], s. d. Disponível em: https://developer.mozilla.org/en-US/docs/Web/Security/Mixed_content
+. Acesso em: 31 jan. 2026.
+
+MDN WEB DOCS. CORS. [S. l.], s. d. Disponível em: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+. Acesso em: 31 jan. 2026.
+
+GITHUB. GitHub Actions Documentation. [S. l.], s. d. Disponível em: https://docs.github.com/actions
+. Acesso em: 31 jan. 2026.

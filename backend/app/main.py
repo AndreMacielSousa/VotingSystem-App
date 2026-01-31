@@ -6,13 +6,24 @@ from .grpc_clients import RegistrationClient, VotingClient, GrpcurlError
 
 load_dotenv()
 
-app = FastAPI(title="VotingSystem-App Backend", version="0.2.0")
+app = FastAPI(title="VotingSystem-App Backend", version="0.2.1")
 
 registration = RegistrationClient()
 voting = VotingClient()
 
 # Mitigação local: impedir repetição da mesma credencial neste protótipo
 USED_CREDENTIALS = set()
+
+
+def _get(resp: dict, *keys, default=None):
+    """
+    Obtém a primeira chave existente em 'resp' (para suportar snake_case e lowerCamelCase),
+    devolvendo 'default' se nenhuma existir.
+    """
+    for k in keys:
+        if k in resp:
+            return resp[k]
+    return default
 
 
 class RegisterIn(BaseModel):
@@ -42,9 +53,13 @@ def register(data: RegisterIn):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro interno no registo: {e}")
 
+    # Suporta snake_case e lowerCamelCase (Protobuf JSON mapping)
+    is_eligible = bool(_get(resp, "is_eligible", "isEligible", default=False))
+    voting_credential = _get(resp, "voting_credential", "votingCredential", default="")
+
     return {
-        "is_eligible": bool(resp.get("is_eligible", False)),
-        "voting_credential": resp.get("voting_credential", "")
+        "is_eligible": is_eligible,
+        "voting_credential": voting_credential,
     }
 
 
@@ -71,22 +86,22 @@ def do_vote(data: VoteIn):
     Submete o voto com voting_credential e candidate_id.
     Inclui bloqueio local para evitar repetição da credencial no protótipo.
     """
-    # Bloqueio local: uma submissão por credencial nesta app
     if data.voting_credential in USED_CREDENTIALS:
         raise HTTPException(
             status_code=409,
-            detail="Esta credencial já foi usada nesta aplicação (bloqueio local do protótipo)."
+            detail="Esta credencial já foi usada nesta aplicação (bloqueio local do protótipo).",
         )
 
     try:
-        resp = voting.vote(data.voting_credential, data.candidate_id)  # dict: {"success":..., "message":...}
+        resp = voting.vote(data.voting_credential, data.candidate_id)
     except GrpcurlError as e:
         raise HTTPException(status_code=502, detail=f"Erro ao contactar AV (grpcurl): {e}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro interno ao submeter voto: {e}")
 
-    success = bool(resp.get("success", False))
-    message = resp.get("message", "")
+    # Suporta snake_case e lowerCamelCase
+    success = bool(_get(resp, "success", default=False))
+    message = str(_get(resp, "message", default=""))
 
     if success:
         USED_CREDENTIALS.add(data.voting_credential)

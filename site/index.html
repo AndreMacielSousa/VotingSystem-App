@@ -191,16 +191,21 @@
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
 
     /* Aviso de demo online */
-    .banner {
-      border: 1px solid rgba(251,191,36,0.50);
-      background: rgba(251,191,36,0.10);
-      border-radius: 16px;
-      padding: 12px 14px;
-      margin: 12px 18px 0;
-      max-width: 1050px;
-      color: rgba(233,239,255,0.95);
-      box-shadow: var(--shadow);
-    }
+/* Aviso de demo online */
+.banner {
+  border: 1px solid rgba(251,191,36,0.50);
+  background: rgba(251,191,36,0.10);
+  border-radius: 16px;
+  padding: 12px 14px;
+
+  /* 👉 alinhamento correto */
+  max-width: 1050px;
+  margin: 12px auto 0;   /* centra horizontalmente */
+
+  color: rgba(233,239,255,0.95);
+  box-shadow: var(--shadow);
+}
+
     .banner a { color: var(--text); text-decoration: underline; }
     .banner .title { font-weight: 700; font-size: 13px; margin-bottom: 4px; }
     .banner .body { font-size: 13px; color: rgba(233,239,255,0.92); }

@@ -35,7 +35,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\Grupo EMAC\OneDrive - Universidade Aberta\Documents\GitHub\VotingSystem-App\backend\.venv"
+VIRTUAL_ENV="C:\users\Grupo EMAC\OneDrive - Universidade Aberta\Documents\GitHub\VotingSystem-App\backend\.venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

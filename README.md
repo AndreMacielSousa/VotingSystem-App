@@ -1,5 +1,25 @@
 # VotingSystem-App
 
+```mermaid
+
+flowchart LR
+    Eleitor((Eleitor))
+
+    subgraph Sistema["Aplicação de Votação Eletrónica"]
+        UC1["UC1: Registar eleitor e emitir credencial"]
+        UC2["UC2: Consultar lista de candidatos"]
+        UC3["UC3: Submeter voto"]
+        UC4["UC4: Consultar resultados da votação"]
+    end
+
+    Eleitor --> UC1
+    Eleitor --> UC2
+    Eleitor --> UC3
+    Eleitor --> UC4
+
+
+```
+
 Protótipo de aplicação de votação eletrónica que consome serviços gRPC remotos e expõe um backend REST (orquestração) + frontend web estático, seguindo um processo em três fases:
 1) Registo (emissão de credencial)
 2) Votação (submissão de voto com credencial)

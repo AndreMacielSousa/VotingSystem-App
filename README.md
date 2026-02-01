@@ -1,5 +1,25 @@
 # VotingSystem-App
 
+```mermaid
+
+flowchart LR
+    Eleitor((Eleitor))
+
+    subgraph Sistema["Aplicação de Votação Eletrónica"]
+        UC1["UC1: Registar eleitor e emitir credencial"]
+        UC2["UC2: Consultar lista de candidatos"]
+        UC3["UC3: Submeter voto"]
+        UC4["UC4: Consultar resultados da votação"]
+    end
+
+    Eleitor --> UC1
+    Eleitor --> UC2
+    Eleitor --> UC3
+    Eleitor --> UC4
+
+
+```
+
 Protótipo de aplicação de votação eletrónica que consome serviços gRPC remotos e expõe um backend REST (orquestração) + frontend web estático, seguindo um processo em três fases:
 1) Registo (emissão de credencial)
 2) Votação (submissão de voto com credencial)
@@ -171,14 +191,13 @@ curl -Method POST http://127.0.0.1:8000/vote -ContentType "application/json" -Bo
 
 Referências bibliográficas (ABNT)
 
-FASTAPI. CORS (Cross-Origin Resource Sharing). [S. l.], s. d. Disponível em: https://fastapi.tiangolo.com/tutorial/cors/
-. Acesso em: 31 jan. 2026.
+* FIELDING, Roy Thomas. Architectural styles and the design of network-based software architectures. 2000. Tese (Doutoramento em Ciência da Computação) – University of California, Irvine, Irvine, 2000.
+* FASTAPI. FastAPI Documentation. [S. l.], s. d. Disponível em: https://fastapi.tiangolo.com. Acesso em: 27 jan. 2026.
+* GOOGLE. Protocol Buffers: JSON Mapping. [S. l.], s. d. Disponível em: https://protobuf.dev/programming-guides/proto3/#json. Acesso em: 14 jan. 2026.
+* GRPCURL. gRPCurl: A command-line tool for interacting with gRPC servers. [S. l.], s. d. Disponível em: https://github.com/fullstorydev/grpcurl. Acesso em: 21 jan. 2026.
+* MAHMOOD, Zaigham. Service-oriented architecture: potential benefits and challenges. In: WSEAS International Conference on Computers, 11., 2007, Agios Nikolaos. Proceedings […]. Agios Nikolaos: WSEAS Press, 2007.
+* MDN WEB DOCS. Mixed content. [S. l.], s. d. Disponível em: https://developer.mozilla.org/en-US/docs/Web/Security/Mixed_content. Acesso em: 19 jan. 2026.
+* NIKNEJAD, Naghmeh et al. Understanding service-oriented architecture (SOA): a systematic literature review and directions for further investigation. Information Systems, v. 91, p. 101491, 2020.
+* RUH, William A.; MAGINNIS, Francis X.; BROWN, William J. Enterprise application integration: a Wiley tech brief. New York: John Wiley & Sons, 2001.
+* UNIVERSIDADE DE TRÁS-OS-MONTES E ALTO DOURO. Voting system: enunciado e especificações do processo e dos serviços gRPC. Vila Real: UTAD, 2025.
 
-MDN WEB DOCS. Mixed content. [S. l.], s. d. Disponível em: https://developer.mozilla.org/en-US/docs/Web/Security/Mixed_content
-. Acesso em: 31 jan. 2026.
-
-MDN WEB DOCS. CORS. [S. l.], s. d. Disponível em: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
-. Acesso em: 31 jan. 2026.
-
-GITHUB. GitHub Actions Documentation. [S. l.], s. d. Disponível em: https://docs.github.com/actions
-. Acesso em: 31 jan. 2026.
